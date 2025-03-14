@@ -33,7 +33,7 @@ resource "aws_security_group" "allow_ssh_http" {
 
 # Defined the EC2 instance
 resource "aws_instance" "nginx_server" {
-  ami           = "ami-05c179eced2eb9b5b"
+  ami           = "ami-00bb6a80f01f03502"
   instance_type = "t2.micro"
   key_name      = "mihir"
 
@@ -46,22 +46,13 @@ resource "aws_instance" "nginx_server" {
 
   # Generate Ansible Inventory File
   provisioner "local-exec" {
-    command     = <<EOT
+    interpreter = ["PowerShell", "-Command"]
+    command     = <<EOF
     echo "[web]" > ../ansible-setup/inventory
-    echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem" >> ../ansible-setup/inventory
-  EOT
-    interpreter = ["cmd.exe", "/c"]
+    echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=/home/mihir/.ssh/mihir.pem" >> ../ansible-setup/inventory
+EOF
   }
 }
-
-#   provisioner "local-exec" {
-#     interpreter = ["PowerShell", "-Command"]
-#     command     = <<EOF
-#     echo "[web]" > ../ansible-setup/inventory
-#     echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem" >> ../ansible-setup/inventory
-# EOF
-#   }
-
 
 # Output the Public IP
 output "instance_ip" {
