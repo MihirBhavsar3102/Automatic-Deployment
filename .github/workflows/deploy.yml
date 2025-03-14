@@ -33,12 +33,16 @@ jobs:
 
       - name: Configure SSH Key
         run: |
-          mkdir -p /home/mihir/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > /home/mihir/.ssh/mihir.pem
-          chmod 600 /home/mihir/.ssh/mihir.pem
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/mihir.pem
+          chmod 600 ~/.ssh/mihir.pem
           eval "$(ssh-agent -s)"
-          ssh-add /home/mihir/.ssh/mihir.pem
+          ssh-add ~/.ssh/mihir.pem
 
+      - name: Debug SSH Key Path
+        run: |
+          ls -l ~/.ssh
+          cat ~/.ssh/mihir.pem | head -n 5
 
       - name: Add SSH Host Key to Known Hosts
         run: |
