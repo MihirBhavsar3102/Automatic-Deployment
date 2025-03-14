@@ -47,4 +47,4 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           cd ansible-setup
-          ansible-playbook -i ansible-setup/inventory ansible-setup/nginx-setup.yml
+          bash fix_inventory.sh && ansible-playbook -i ansible-setup/inventory ansible-setup/nginx-setup.yml

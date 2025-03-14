@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INVENTORY_FILE="/mnt/c/Mihir Bhavsar/Automatic Deployment/ansible-setup"
+INVENTORY_FILE="/mnt/c/Mihir Bhavsar/Automatic Deployment/ansible-setup/inventory"
 
 echo "Fixing inventory file: $INVENTORY_FILE"
 
