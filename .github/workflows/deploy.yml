@@ -70,7 +70,8 @@ jobs:
           fi
       
       - name: Fix Line Endings
-          run: dos2unix ansible-setup/inventory || echo "dos2unix not needed"
+        run: |
+          dos2unix ansible-setup/inventory || echo "dos2unix not needed"
 
       - name: Run Ansible Playbook
         run: |
