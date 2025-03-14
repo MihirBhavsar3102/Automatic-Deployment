@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "ap-south-1"
+  region     = "ap-south-1"
   access_key = "AKIA5G2VG2TXYBMTCZ5A"
   secret_key = "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"
 }
@@ -33,10 +33,10 @@ resource "aws_security_group" "allow_ssh_http" {
 
 # Defined the EC2 instance
 resource "aws_instance" "nginx_server" {
-  ami           = "ami-0c50b6f7dc3701ddd" 
+  ami           = "ami-05c179eced2eb9b5b"
   instance_type = "t2.micro"
-  key_name      = "my-key"
-  
+  key_name      = "mihir"
+
   # Used `vpc_security_group_ids` instead of `security_groups`
   vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
 
@@ -46,10 +46,11 @@ resource "aws_instance" "nginx_server" {
 
   # Generate Ansible Inventory File
   provisioner "local-exec" {
-    command = <<EOT
-      echo "[web]" > ../ansible-setup/inventory
-      echo "nginx-server ansible_host=${self.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/my-key.pem " >> ../ansible-setup/inventory
-    EOT
+    interpreter = ["PowerShell", "-Command"]
+    command     = <<EOF
+    echo "[web]" > ../ansible-setup/inventory
+    echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem" >> ../ansible-setup/inventory
+EOF
   }
 }
 
