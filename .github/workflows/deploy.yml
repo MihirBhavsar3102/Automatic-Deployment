@@ -59,16 +59,18 @@ jobs:
           ls -l ansible-setup/inventory || echo "Inventory file is missing!"
           ls -l ansible-setup/nginx-setup.yml || echo "Playbook file is missing!"
 
-      - name: Fix Inventory Encoding & Permissions
+      - name: Convert Inventory Encoding Only If Needed
         run: |
-          if [ -f ansible-setup/inventory ]; then
+          FILE_ENCODING=$(file -bi ansible-setup/inventory | cut -d'=' -f2)
+          if [[ "$FILE_ENCODING" == "utf-16le" || "$FILE_ENCODING" == "utf-16be" ]]; then
+            echo "Converting from UTF-16 to UTF-8..."
             iconv -f UTF-16 -t UTF-8 ansible-setup/inventory -o ansible-setup/inventory
-            dos2unix ansible-setup/inventory
-            chmod 644 ansible-setup/inventory
           else
-            echo "ERROR: Inventory file missing!"
-            exit 1
+            echo "Skipping conversion: Already UTF-8"
           fi
+      
+      - name: Fix Line Endings
+          run: dos2unix ansible-setup/inventory || echo "dos2unix not needed"
 
       - name: Run Ansible Playbook
         run: |
