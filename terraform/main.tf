@@ -46,13 +46,22 @@ resource "aws_instance" "nginx_server" {
 
   # Generate Ansible Inventory File
   provisioner "local-exec" {
-    interpreter = ["PowerShell", "-Command"]
-    command     = <<EOF
+    command     = <<EOT
     echo "[web]" > ../ansible-setup/inventory
     echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem" >> ../ansible-setup/inventory
-EOF
+  EOT
+    interpreter = ["cmd.exe", "/c"]
   }
 }
+
+#   provisioner "local-exec" {
+#     interpreter = ["PowerShell", "-Command"]
+#     command     = <<EOF
+#     echo "[web]" > ../ansible-setup/inventory
+#     echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem" >> ../ansible-setup/inventory
+# EOF
+#   }
+
 
 # Output the Public IP
 output "instance_ip" {
