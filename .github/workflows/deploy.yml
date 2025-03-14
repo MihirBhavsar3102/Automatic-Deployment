@@ -33,7 +33,7 @@ jobs:
 
       - name: Configure SSH Key
         run: |
-          mkdir -p ~/.ssh
+          mkdir -p /home/mihir/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > /home/mihir/.ssh/mihir.pem
           chmod 600 /home/mihir/.ssh/mihir.pem
           eval "$(ssh-agent -s)"
