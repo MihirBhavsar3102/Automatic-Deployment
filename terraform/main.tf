@@ -46,11 +46,11 @@ resource "aws_instance" "nginx_server" {
 
   # Generate Ansible Inventory File
   provisioner "local-exec" {
-    interpreter = ["PowerShell", "-Command"]
-    command     = <<EOF
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<EOT
     echo "[web]" > ../ansible-setup/inventory
     echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=/home/mihir/.ssh/mihir.pem" >> ../ansible-setup/inventory
-EOF
+EOT
   }
 }
 
