@@ -1,7 +1,5 @@
 provider "aws" {
   region     = "ap-south-1"
-  access_key = "AKIA5G2VG2TXYBMTCZ5A"
-  secret_key = "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"
 }
 
 # Defined the Security Group
@@ -46,12 +44,10 @@ resource "aws_instance" "nginx_server" {
 
   # Generate Ansible Inventory File
   provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-    command     = <<EOT
-    mkdir -p ../ansible-setup
-    echo "[web]" > ../ansible-setup/inventory
-    echo "${aws_instance.nginx_server.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=/home/mihir/.ssh/mihir.pem" >> ../ansible-setup/inventory
-EOT
+    command = <<EOT
+      echo "[web]" > ../ansible-setup/inventory
+      echo "nginx-server ansible_host=${self.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem " >> ../ansible-setup/inventory
+    EOT
   }
 }
 

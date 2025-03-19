@@ -14,9 +14,6 @@ jobs:
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
-      
-      - name: Install dos2unix
-        run: sudo apt-get update && sudo apt-get install -y dos2unix
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -38,43 +35,14 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/mihir.pem
-          chmod 700 ~/.ssh/mihir.pem
-          eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/mihir.pem
+          chmod 600 ~/.ssh/mihir.pem
           ssh-keygen -y -f ~/.ssh/mihir.pem > ~/.ssh/mihir.pub || echo "Invalid key"
-
-      - name: Debug SSH Key Path
-        run: |
-          ls -l ~/.ssh
-          cat ~/.ssh/mihir.pem | head -n 5
 
       - name: Add SSH Host Key to Known Hosts
         run: |
-          INSTANCE_IP=$(awk '/^[0-9]/ {print $1}' ansible-setup/inventory)
-          echo "Using Host: $INSTANCE_IP"
-          ssh-keyscan -H "$INSTANCE_IP" >> ~/.ssh/known_hosts
-
-      # - name: Debug File Paths
-      #   run: |
-      #     ls -l ansible-setup/
-      #     ls -l ansible-setup/inventory || echo "Inventory file is missing!"
-      #     ls -l ansible-setup/nginx-setup.yml || echo "Playbook file is missing!"
-
-      - name: Convert Inventory Encoding Only If Needed
-        run: |
-          FILE_ENCODING=$(file -bi ansible-setup/inventory | cut -d'=' -f2)
-          if [[ "$FILE_ENCODING" == "utf-16le" || "$FILE_ENCODING" == "utf-16be" ]]; then
-            echo "Converting from UTF-16 to UTF-8..."
-            iconv -f UTF-16 -t UTF-8 ansible-setup/inventory -o ansible-setup/inventory
-          else
-            echo "Skipping conversion: Already UTF-8"
-          fi
+          ssh-keyscan -H $(grep -oP '(?<=ansible_host=)[^ ]+' ansible-setup/inventory) >> ~/.ssh/known_hosts
       
-      # - name: Fix Line Endings
-      #   run: |
-      #     dos2unix ansible-setup/inventory || echo "dos2unix not needed"
-
       - name: Run Ansible Playbook
         run: |
           cd ansible-setup
-          ansible-playbook -i ansible-setup/inventory ansible-setup/nginx-setup.yml
+          ansible-playbook -i inventory nginx-setup.yml
