@@ -17,7 +17,7 @@
 
     - name: Copy project files from local machine
       copy:
-        src: /home/mihir/Automatic-Deployment/E-CommerceWebsite
+        src: /Automatic-Deployment/E-CommerceWebsite
         dest: /var/www/html/
         owner: www-data
         group: www-data
