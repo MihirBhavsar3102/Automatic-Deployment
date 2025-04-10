@@ -14,8 +14,8 @@ data "aws_security_groups" "existing_sg" {
   }
 }
 
-resource "aws_security_group" "allow_ssh_http" {
-  count       = var.use_existing_sg_id == "" ? 1 : 0
+resource "aws_security_group" "new_sg" {
+  count       = length(data.aws_security_groups.existing_sg.ids) == 0 ? 1 : 0
   name        = "allow_ssh_http"
   description = "Allow SSH and HTTP traffic"
 
