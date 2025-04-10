@@ -41,6 +41,10 @@ resource "aws_security_group" "allow_ssh_http" {
   }
 }
 
+locals {
+  security_group_id = length(data.aws_security_groups.existing_sg.ids) > 0 ?data.aws_security_groups.existing_sg.ids[0] :aws_security_group.new_sg[0].id
+}
+
 resource "aws_instance" "Auto_Deploy_Website" {
   ami           = "ami-00bb6a80f01f03502"
   instance_type = "t2.micro"
