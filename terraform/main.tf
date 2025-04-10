@@ -50,9 +50,7 @@ resource "aws_instance" "Auto_Deploy_Website" {
   instance_type = "t2.micro"
   key_name      = "mihir"
 
-  vpc_security_group_ids = [
-    var.use_existing_sg_id != "" ? var.use_existing_sg_id : aws_security_group.allow_ssh_http[0].id
-  ]
+  vpc_security_group_ids = [local.security_group_id]
 
   tags = {
     Name = "Auto_Deploy_Website"
