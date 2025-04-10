@@ -2,8 +2,13 @@ provider "aws" {
   region     = "ap-south-1"
 }
 
-# Defined the Security Group
+variable "use_existing_sg_id" {
+  type    = string
+  default = ""
+}
+
 resource "aws_security_group" "allow_ssh_http" {
+  count       = var.use_existing_sg_id == "" ? 1 : 0
   name        = "allow_ssh_http"
   description = "Allow SSH and HTTP traffic"
 
@@ -29,29 +34,32 @@ resource "aws_security_group" "allow_ssh_http" {
   }
 }
 
-# Defined the EC2 instance
-resource "aws_instance" "nginx_server" {
+resource "aws_instance" "Auto_Deploy_Website" {
   ami           = "ami-00bb6a80f01f03502"
   instance_type = "t2.micro"
   key_name      = "mihir"
 
-  # Used `vpc_security_group_ids` instead of `security_groups`
-  vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
+  vpc_security_group_ids = [
+    var.use_existing_sg_id != "" ? var.use_existing_sg_id : aws_security_group.allow_ssh_http[0].id
+  ]
 
   tags = {
-    Name = "nginx-server"
+    Name = "Auto_Deploy_Website"
   }
 
-  # Generate Ansible Inventory File
   provisioner "local-exec" {
     command = <<EOT
       echo "[web]" > ../ansible-setup/inventory
-      echo "nginx-server ansible_host=${self.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem " >> ../ansible-setup/inventory
+      echo "nginx-server ansible_host=${self.public_ip} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mihir.pem" >> ../ansible-setup/inventory
     EOT
+  }
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [ami]
   }
 }
 
-# Output the Public IP
 output "instance_ip" {
-  value = aws_instance.nginx_server.public_ip
+  value = aws_instance.Auto_Deploy_Website.public_ip
 }
