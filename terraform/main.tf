@@ -7,6 +7,13 @@ variable "use_existing_sg_id" {
   default = ""
 }
 
+data "aws_security_groups" "existing_sg" {
+  filter {
+    name   = "group-name"
+    values = ["allow_ssh_http"]
+  }
+}
+
 resource "aws_security_group" "allow_ssh_http" {
   count       = var.use_existing_sg_id == "" ? 1 : 0
   name        = "allow_ssh_http"
