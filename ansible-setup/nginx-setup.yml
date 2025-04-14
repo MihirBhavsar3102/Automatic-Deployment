@@ -17,7 +17,7 @@
 
     - name: Copy project files from local machine
       copy:
-        src: "{{ lookup('env', 'GITHUB_WORKSPACE') }}/E-CommerceWebsite"
+        src: "{{ lookup('env', 'GITHUB_WORKSPACE') | default('../E-CommerceWebsite', true) }}"
         dest: /var/www/html/
         owner: www-data
         group: www-data
